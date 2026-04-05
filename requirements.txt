@@ -1,0 +1,45 @@
+# =============================================================================
+# requirements.txt — AI Agent Evaluation Examples
+# =============================================================================
+# Install: pip install -r requirements.txt
+#
+# Each section corresponds to one example script.
+# Install only what you need, or install everything at once.
+# =============================================================================
+
+# ─────────────────────────────────────────────
+# 01_deepeval_agent_eval.py — DeepEval
+# ─────────────────────────────────────────────
+deepeval>=3.0.0
+openai>=1.0.0                  # Default LLM judge (or use any provider below)
+
+# ─────────────────────────────────────────────
+# 02_inspect_ai_agent_eval.py — Inspect AI (UK AISI)
+# ─────────────────────────────────────────────
+inspect-ai>=0.3.130
+inspect-evals                  # Optional: 100+ pre-built benchmarks (GAIA, SWE-bench, etc.)
+
+# ─────────────────────────────────────────────
+# 03_azure_ai_eval_agents.py — Azure AI Evaluation SDK
+# ─────────────────────────────────────────────
+azure-ai-evaluation>=1.0.0
+azure-identity>=1.15.0
+python-dotenv>=1.0.0
+
+# ─────────────────────────────────────────────
+# Optional: Alternative LLM providers for DeepEval / Inspect AI
+# ─────────────────────────────────────────────
+anthropic>=0.30.0            # Use Claude as judge
+google-generativeai>=0.5.0   # Use Gemini as judge
+litellm>=1.30.0              # Universal LLM proxy (100+ providers)
+ollama>=0.2.0                # Local models via Ollama
+
+# ─────────────────────────────────────────────
+# Optional: CI/CD & Observability integrations
+# ─────────────────────────────────────────────
+pytest>=8.0.0                # Already a dependency of deepeval
+opentelemetry-api>=1.37.0    # OTel instrumentation standard
+opentelemetry-sdk>=1.37.0
+arize-phoenix>=5.0.0         # Open-source observability (self-hosted)
+langsmith>=0.1.0             # LangChain observability platform
+braintrust>=0.0.160          # Braintrust eval platform

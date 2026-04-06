@@ -225,6 +225,8 @@ Presentation and deep-dive documentation is available under `docs/`:
 - `docs/guide_es.md`: speaker guide (ES)
 - `docs/technical_guide_en.md`: detailed technical walkthrough (EN)
 - `docs/technical_guide_es.md`: detailed technical walkthrough (ES)
+- `docs/integration_checklist_en.md`: real-agent integration go-live checklist (EN)
+- `docs/integration_checklist_es.md`: real-agent integration go-live checklist (ES)
 
 ## Troubleshooting
 

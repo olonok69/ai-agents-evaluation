@@ -24,7 +24,30 @@ Reference:
 """
 
 import json
+import os
 from typing import List, Dict
+
+from dotenv import load_dotenv
+
+
+def _bootstrap_deepeval_env() -> None:
+    """Load .env and normalize Azure variable names for DeepEval."""
+    load_dotenv()
+
+    env_aliases = {
+        "AZURE_ENDPOINT": "AZURE_OPENAI_ENDPOINT",
+        "AZURE_API_KEY": "AZURE_OPENAI_API_KEY",
+        "AZURE_API_VERSION": "OPENAI_API_VERSION",
+        "AZURE_DEPLOYMENT_NAME": "AZURE_MODEL_NAME",
+    }
+
+    for source, target in env_aliases.items():
+        if not os.environ.get(target) and os.environ.get(source):
+            os.environ[target] = os.environ[source]
+
+
+# Ensure DeepEval can resolve provider config before metrics are initialized.
+_bootstrap_deepeval_env()
 
 # ─────────────────────────────────────────────
 # SECTION 1: End-to-End Agent Evaluation (Black-Box)

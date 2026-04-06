@@ -648,7 +648,108 @@ Si necesitas una frase por estilo de programación:
 
 ---
 
-## 7. Referencias
+## 7. Integración con un Agente Real (De Datos Mock a Trazas de Producción)
+
+Los ejemplos de este repositorio usan datos mock para enseñar el comportamiento de los evaluadores.
+En proyectos reales, debes alimentar los evaluadores con trazas reales del agente.
+
+Como mínimo, captura estos campos por ejecución:
+
+- `input`: qué pidió el usuario.
+- `output`: respuesta final del asistente.
+- `tool_calls`: nombre de herramienta, argumentos, resultado y `tool_call_id` cuando exista.
+
+Campos adicionales recomendados:
+
+- `expected_output`: etiqueta gold o conjunto de hechos esperados.
+- `expected_tools`: herramientas esperadas para el escenario.
+- metadatos: `run_id`, versión de modelo, latencia, timestamp, entorno.
+
+### 7.1 Qué Reemplazar en `01_deepeval_agent_eval.py`
+
+Reemplaza los `LLMTestCase(...)` mock por test cases generados desde logs reales.
+
+Mapeo:
+
+- `input` <- prompt real del usuario.
+- `actual_output` <- respuesta final del agente.
+- `expected_output` <- respuesta gold/objetivo de rúbrica.
+- `tools_called` <- tool calls de la traza runtime.
+- `expected_tools` <- herramientas esperadas según el escenario de prueba.
+
+En `example_3_component_level_tracing()`, reemplaza funciones simuladas por wrappers de tu orquestador/herramientas reales para que los spans `@observe` representen ejecución real.
+
+### 7.2 Qué Reemplazar en `02_inspect_ai_agent_eval.py`
+
+Usa uno de dos modos de integración:
+
+1. Modo harness:
+	 Inspect ejecuta tu agente real para cada `Sample`.
+2. Modo replay:
+	 Inspect puntúa salidas ya capturadas en logs.
+
+Reemplazos concretos:
+
+- Sustituye implementaciones mock de `@tool` por conectores reales (API/base de datos/servicio).
+- Sustituye `dataset=[Sample(...)]` estático por tus escenarios de evaluación.
+- Mantén estructura `@task` y scorers, pero enruta generación/ejecución de herramientas a tu stack real.
+
+### 7.3 Qué Reemplazar en `03_azure_ai_eval_agents.py`
+
+Este script ya está muy cerca de integración productiva.
+
+Reemplazos concretos:
+
+- Reemplaza ejemplos inline de `query`/`response` por datos construidos desde sesiones reales.
+- Construye `query_messages`/`response_messages` desde trazas conversacionales reales.
+- En modo batch (`example_5_batch_evaluation()`), escribe JSONL desde ejecuciones reales en lugar de ejemplos estáticos.
+
+Requisito crítico de esquema:
+
+- incluye `tool_call_id` de forma consistente en mensajes relacionados a tool calls.
+
+### 7.4 Esquema Canónico de Traza (Recomendado)
+
+Usa un esquema normalizado único y transpórmalo según framework.
+
+```json
+{
+	"run_id": "abc-123",
+	"timestamp": "2026-04-06T10:00:00Z",
+	"input": "User request text",
+	"output": "Final assistant response",
+	"tool_calls": [
+		{
+			"tool_call_id": "call_001",
+			"name": "search_flights",
+			"arguments": {"origin": "NYC", "destination": "LON"},
+			"result": [{"airline": "X", "price": 500}]
+		}
+	],
+	"expected_output": "Optional gold answer",
+	"expected_tools": ["search_flights"]
+}
+```
+
+### 7.5 Despliegue Recomendado para Casos Reales
+
+1. Instrumenta una vez el runtime de tu agente para capturar trazas normalizadas.
+2. Exporta trazas a JSON/JSONL.
+3. Construye adaptadores:
+	 - traza -> DeepEval `LLMTestCase`
+	 - traza -> Inspect `Sample`/input de tarea
+	 - traza -> Azure `query_messages`/`response_messages`
+4. Ejecuta evaluaciones periódicas (CI y/o nocturnas).
+5. Monitorea regresiones y bloquea releases con umbrales de métricas.
+
+### 7.6 Checklist Complementario de Go-Live
+
+Usa estos checklists como complemento operativo de esta sección:
+
+- `docs/integration_checklist_en.md`
+- `docs/integration_checklist_es.md`
+
+## 8. Referencias
 
 - DeepEval docs: https://deepeval.com/docs/getting-started?utm_source=GitHub
 - DeepEval repo: https://github.com/confident-ai/deepeval

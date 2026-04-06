@@ -648,7 +648,108 @@ If you need one sentence per programming style:
 
 ---
 
-## 7. References
+## 7. Integrating With a Real Agent (From Mock Data to Production Traces)
+
+The examples in this repository use mock inputs to teach evaluator behavior.
+In real projects, you should feed evaluators with actual agent traces.
+
+At minimum, capture these fields from each run:
+
+- `input`: what the user asked.
+- `output`: final assistant response.
+- `tool_calls`: tool name, arguments, result, and `tool_call_id` when available.
+
+Recommended additional fields:
+
+- `expected_output`: gold label or expected fact set.
+- `expected_tools`: expected tool names for the scenario.
+- metadata: `run_id`, model version, latency, timestamp, environment.
+
+### 7.1 What to Replace in `01_deepeval_agent_eval.py`
+
+Replace mock `LLMTestCase(...)` definitions with test cases generated from real logs.
+
+Mapping:
+
+- `input` <- real user prompt.
+- `actual_output` <- final agent answer.
+- `expected_output` <- gold answer/rubric target.
+- `tools_called` <- tool calls from runtime trace.
+- `expected_tools` <- expected tools from test scenario.
+
+In `example_3_component_level_tracing()`, replace simulated functions with wrappers around your real orchestrator/tools so `@observe` spans represent true execution.
+
+### 7.2 What to Replace in `02_inspect_ai_agent_eval.py`
+
+Use one of two integration modes:
+
+1. Harness mode:
+	 Inspect runs your real agent for each `Sample`.
+2. Replay mode:
+	 Inspect scores outputs already captured in logs.
+
+Concrete replacements:
+
+- Replace mock `@tool` implementations with real connectors (API/database/service).
+- Replace static `dataset=[Sample(...)]` with your eval scenarios.
+- Keep `@task` and scorer structure, but route generation/tool execution through your real stack.
+
+### 7.3 What to Replace in `03_azure_ai_eval_agents.py`
+
+This script is already close to production integration.
+
+Concrete replacements:
+
+- Replace inline `query`/`response` examples with data built from real sessions.
+- Build `query_messages`/`response_messages` from actual conversation traces.
+- In batch mode (`example_5_batch_evaluation()`), write JSONL from real runs instead of static examples.
+
+Critical schema requirement:
+
+- include `tool_call_id` consistently in tool-call related message items.
+
+### 7.4 Canonical Trace Schema (Recommended)
+
+Use one normalized schema and transform it per framework.
+
+```json
+{
+	"run_id": "abc-123",
+	"timestamp": "2026-04-06T10:00:00Z",
+	"input": "User request text",
+	"output": "Final assistant response",
+	"tool_calls": [
+		{
+			"tool_call_id": "call_001",
+			"name": "search_flights",
+			"arguments": {"origin": "NYC", "destination": "LON"},
+			"result": [{"airline": "X", "price": 500}]
+		}
+	],
+	"expected_output": "Optional gold answer",
+	"expected_tools": ["search_flights"]
+}
+```
+
+### 7.5 Suggested Rollout for Real Use Cases
+
+1. Instrument your agent runtime once to capture normalized traces.
+2. Export traces to JSON/JSONL.
+3. Build adapters:
+	 - trace -> DeepEval `LLMTestCase`
+	 - trace -> Inspect `Sample`/task input
+	 - trace -> Azure `query_messages`/`response_messages`
+4. Run periodic evals (CI and/or nightly).
+5. Track regressions and gate releases on metric thresholds.
+
+### 7.6 Go-Live Checklist Companion
+
+Use these checklists as an operational companion to this section:
+
+- `docs/integration_checklist_en.md`
+- `docs/integration_checklist_es.md`
+
+## 8. References
 
 - DeepEval docs: https://deepeval.com/docs/getting-started?utm_source=GitHub
 - DeepEval repo: https://github.com/confident-ai/deepeval

@@ -225,6 +225,8 @@ La documentación de presentación y detalle técnico está en `docs/`:
 - `docs/guide_es.md`: guía del presentador (ES)
 - `docs/technical_guide_en.md`: walkthrough técnico detallado (EN)
 - `docs/technical_guide_es.md`: walkthrough técnico detallado (ES)
+- `docs/integration_checklist_en.md`: checklist de go-live para integración de agente real (EN)
+- `docs/integration_checklist_es.md`: checklist de go-live para integración de agente real (ES)
 
 ## Resolución de Problemas
 

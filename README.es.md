@@ -256,5 +256,3 @@ La documentación de presentación y detalle técnico está en `docs/`:
 4. Usa `docs/technical_guide_en.md` o `docs/technical_guide_es.md` como referencia para explicación técnica.
 
 ---
-
-Para workshops y presentaciones técnicas, usa las guías técnicas como referencia a nivel script y las guías del presentador para la narrativa de diapositivas.

@@ -257,4 +257,3 @@ Presentation and deep-dive documentation is available under `docs/`:
 
 ---
 
-For technical workshops and talks, use the two technical guides as your script-level speaking reference and the speaker guides as your slide-level narrative.

@@ -254,5 +254,4 @@ La documentación de presentación y detalle técnico está en `docs/`:
 2. Continúa con `02_inspect_ai_agent_eval.py` para validar comportamiento multi-paso más complejo.
 3. Ejecuta `03_azure_ai_eval_agents.py` para métricas agénticas alineadas a Azure y evaluación batch.
 4. Usa `docs/technical_guide_en.md` o `docs/technical_guide_es.md` como referencia para explicación técnica.
-
 ---

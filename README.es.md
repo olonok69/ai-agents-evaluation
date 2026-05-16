@@ -33,6 +33,7 @@ El proyecto demuestra un enfoque multi-framework y práctico para evaluación de
 - ejecutar evaluaciones unitarias y a escala de dataset (batch)
 - preparar patrones de evaluación aptos para CI/CD y presentaciones técnicas
 
+
 ## Qué Aprenderás
 
 Al recorrer los scripts, aprenderás a:
